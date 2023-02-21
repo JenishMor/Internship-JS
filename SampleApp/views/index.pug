@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#{title} </title>
+    style
+        include ../static/style.css
+    <!-- here first we go to static folder and then we go into style.css          -->
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li>
+                <a href="/">Home</a>
+                <a href="/">About</a>
+                <a href="/">Contact</a>
+            </li>
+            <p>Gujrat Technological University</p>
+        </ul>
+    </nav>
+
+    <h2>Here is the form for your winter examination</h2>
+
+    <form action="/" method="POST" id="contact">
+        <input type="text" name="fname" placeholder="Enter your First name">
+        <input type="text" name="lname" placeholder="Enter your Last name">
+        <input type="text" name="gender" placeholder="Enter your gender">
+        <input type="email" name="mail" id="mail" placeholder="Enter your E-mail id">
+        <input type="text" name="en" id="en" placeholder="Enter your En. no.">
+        <input type="number" name="sem" id="sem" placeholder="Enter your semester">
+        <textarea name="more" id="more" cols="30" rows="10" placeholder="more about you"></textarea>
+        <button class="btn">Submit</button>
+    </form>
+
+    <!-- | #{content} -->
+    <!-- | This is the plain html we use as a pug -->
+</body>
+
+</html>
