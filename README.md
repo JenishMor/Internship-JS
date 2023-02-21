@@ -1,3 +1,3 @@
 # Internship-JS
-JavaScript tutorial files.
+JavaScript tutorial files. </br>
 All **JavaScript** files and **mini projects**.
