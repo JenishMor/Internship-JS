@@ -558,14 +558,17 @@ function hmrAccept(bundle, id) {
 
 },{}],"aenu9":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "controlSearchResults", ()=>controlSearchResults);
 var _recipeView = require("./Views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
+var _searchView = require("./Views/searchView");
+var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _modelJs = require("./model.js");
 var _iconsSvg = require("../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _runtime = require("regenerator-runtime/runtime");
 // console.log(icons);
-const recipeContainer = document.querySelector(".recipe");
 // https://forkify-api.herokuapp.com/v2
 // https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886
 ///////////////////////////////////////
@@ -586,13 +589,28 @@ const controlRecipes = async function() {
         console.error(err);
     }
 };
+const controlSearchResults = async function() {
+    try {
+        // 1. Get search query
+        const query = (0, _searchViewDefault.default).getQuery();
+        if (!query) return;
+        // 2. Load search results
+        await _modelJs.loadSearchResults(query);
+        // 3. Render search results.
+        console.log(_modelJs.state.search.results);
+    } catch (err) {
+        console.log(err);
+    }
+};
+controlSearchResults();
 // controlRecipes();
 const init = function() {
     (0, _recipeViewDefault.default).addHandleRender(controlRecipes);
+    (0, _searchViewDefault.default).addHandleSearch(controlSearchResults);
 };
 init();
 
-},{"../img/icons.svg":"cMpiy","regenerator-runtime/runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./model.js":"Y4A21","./Views/recipeView":"17Msr"}],"cMpiy":[function(require,module,exports) {
+},{"../img/icons.svg":"cMpiy","regenerator-runtime/runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./model.js":"Y4A21","./Views/recipeView":"17Msr","./Views/searchView":"1ldzZ"}],"cMpiy":[function(require,module,exports) {
 module.exports = require("5cc94d8d2080ede5").getBundleURL("hWUTQ") + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"5cc94d8d2080ede5":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -1251,11 +1269,16 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
+parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
 var _helpers = require("./helpers");
 const state = {
-    recipe: {}
+    recipe: {},
+    search: {
+        query: "",
+        results: []
+    }
 };
 const loadRecipe = async function(id) {
     try {
@@ -1278,6 +1301,27 @@ const loadRecipe = async function(id) {
         throw err;
     }
 };
+const loadSearchResults = async (query)=>{
+    // https://forkify-api.herokuapp.com/api/v2/recipes
+    try {
+        state.search.query = query;
+        const data = await (0, _helpers.getJSON)(`${(0, _config.API_URL)}/?search=${query}`);
+        console.log(data);
+        state.search.results = data.data.recipes.map((rec)=>{
+            return {
+                id: rec.id,
+                title: rec.title,
+                publisher: rec.publisher,
+                image: rec.image_url
+            };
+        });
+    // console.log(state.search.results);
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
+loadSearchResults("pizza");
 
 },{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs","./helpers":"hGI1E"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1295,7 +1339,7 @@ var _config = require("./config");
 const timeout = function(s) {
     return new Promise(function(_, reject) {
         setTimeout(function() {
-            console.log("Request took too long!", s);
+            // console.log('Request took too long!', s);
             reject(new Error(`Request took too long! Timeout after ${s} second`));
         }, s * 1000);
     });
@@ -1720,6 +1764,28 @@ Fraction.primeFactors = function(n) {
 };
 module.exports.Fraction = Fraction;
 
-},{}]},["d8XZh","aenu9"], "aenu9", "parcelRequire6d3a")
+},{}],"1ldzZ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+class SearchView {
+    #parentEle = document.querySelector(".search");
+    getQuery() {
+        const query = this.#parentEle.querySelector(".search__field").value;
+        this.#clearInput();
+        return query;
+    }
+    #clearInput() {
+        this.#parentEle.querySelector(".search__field").value = "";
+    }
+    addHandleSearch(handler) {
+        this.#parentEle.addEventListener("submit", function(e) {
+            e.preventDefault();
+            handler();
+        });
+    }
+}
+exports.default = new SearchView();
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["d8XZh","aenu9"], "aenu9", "parcelRequire6d3a")
 
 //# sourceMappingURL=index.e37f48ea.js.map
