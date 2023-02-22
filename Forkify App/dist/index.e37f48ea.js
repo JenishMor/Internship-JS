@@ -566,13 +566,6 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _runtime = require("regenerator-runtime/runtime");
 // console.log(icons);
 const recipeContainer = document.querySelector(".recipe");
-const timeout = function(s) {
-    return new Promise(function(_, reject) {
-        setTimeout(function() {
-            reject(new Error(`Request took too long! Timeout after ${s} second`));
-        }, s * 1000);
-    });
-};
 // https://forkify-api.herokuapp.com/v2
 // https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886
 ///////////////////////////////////////
@@ -593,12 +586,10 @@ const controlRecipes = async function() {
     }
 };
 // controlRecipes();
-[
-    "hashchange",
-    "load"
-].forEach((eve)=>{
-    window.addEventListener(eve, controlRecipes);
-}); // window.addEventListener('hashchange', controlRecipes);
+const init = function() {
+    (0, _recipeViewDefault.default).addHandleRender(controlRecipes);
+};
+init();
 
 },{"../img/icons.svg":"cMpiy","regenerator-runtime/runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./model.js":"Y4A21","./Views/recipeView":"17Msr"}],"cMpiy":[function(require,module,exports) {
 module.exports = require("5cc94d8d2080ede5").getBundleURL("hWUTQ") + "icons.21bad73c.svg" + "?" + Date.now();
@@ -1260,14 +1251,14 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 var _regeneratorRuntime = require("regenerator-runtime");
+var _config = require("./config");
+var _helpers = require("./helpers");
 const state = {
     recipe: {}
 };
 const loadRecipe = async function(id) {
     try {
-        const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(`${data.message}, (${res.status})`);
+        const data = await (0, _helpers.getJSON)(`${(0, _config.API_URL)}/${id}`);
         const { recipe  } = data.data;
         state.recipe = {
             id: recipe.id,
@@ -1286,7 +1277,43 @@ const loadRecipe = async function(id) {
     }
 };
 
-},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"17Msr":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs","./helpers":"hGI1E"}],"k5Hzs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "API_URL", ()=>API_URL);
+parcelHelpers.export(exports, "TIMEOUT_SEC", ()=>TIMEOUT_SEC);
+const API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes";
+const TIMEOUT_SEC = 10;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hGI1E":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getJSON", ()=>getJSON);
+var _config = require("./config");
+const timeout = function(s) {
+    return new Promise(function(_, reject) {
+        setTimeout(function() {
+            console.log("Request took too long!", s);
+            reject(new Error(`Request took too long! Timeout after ${s} second`));
+        }, s * 1000);
+    });
+};
+const getJSON = async function(url) {
+    try {
+        // 'https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bcb37'
+        const res = await Promise.race([
+            fetch(url),
+            timeout((0, _config.TIMEOUT_SEC))
+        ]);
+        const data = await res.json(); //This will return promise
+        if (!res.ok) throw new Error(`${data.message}, (${res.status})`);
+        return data;
+    } catch (err) {
+        throw err;
+    }
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs"}],"17Msr":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("../../img/icons.svg");
@@ -1312,6 +1339,14 @@ class RecipeView {
                     </div>`;
         this.#clear();
         this.#parentEle.insertAdjacentHTML("afterbegin", markup);
+    };
+    addHandleRender = (handler)=>{
+        [
+            "hashchange",
+            "load"
+        ].forEach((eve)=>{
+            window.addEventListener(eve, handler);
+        });
     };
     #generateMarkup() {
         // console.log(this.#data);
