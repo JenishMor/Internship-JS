@@ -4,6 +4,8 @@ import { Fraction } from 'fractional';
 class RecipeView {
   #parentEle = document.querySelector('.recipe');
   #data;
+  #errorMsg = "We couldn't find that recipe. Please try another one!";
+  #successMsg = '';
 
   render(data) {
     this.#data = data;
@@ -16,7 +18,7 @@ class RecipeView {
     this.#parentEle.innerHTML = '';
   }
 
-  renderSpinner = () => {
+  renderSpinner() {
     const markup = `<div class="spinner">
                       <svg>
                         <use href="${icons}#icon-loader"></use>
@@ -24,7 +26,33 @@ class RecipeView {
                     </div>`;
     this.#clear();
     this.#parentEle.insertAdjacentHTML('afterbegin', markup);
-  };
+  }
+
+  renderError(message = this.#errorMsg) {
+    const markup = `<div class="error">
+                      <div>
+                        <svg>
+                          <use href="${icons}.svg#icon-alert-triangle"></use>
+                        </svg>
+                      </div>
+                      <p>${message}</p>
+                    </div>`;
+    this.#clear();
+    this.#parentEle.insertAdjacentHTML('afterbegin', markup);
+  }
+
+  renderSuccess(message = this.#successMsg) {
+    const markup = `<div class="message">
+                      <div>
+                        <svg>
+                          <use href="${icons}.svg#icon-smile"></use>
+                        </svg>
+                      </div>
+                      <p>${message}</p>
+                    </div>`;
+    this.#clear();
+    this.#parentEle.insertAdjacentHTML('afterbegin', markup);
+  }
 
   addHandleRender = handler => {
     ['hashchange', 'load'].forEach(eve => {

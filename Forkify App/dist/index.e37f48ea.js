@@ -582,6 +582,7 @@ const controlRecipes = async function() {
         // 2) Rendering recipe
         (0, _recipeViewDefault.default).render(_modelJs.state.recipe);
     } catch (err) {
+        (0, _recipeViewDefault.default).renderError();
         console.error(err);
     }
 };
@@ -1274,6 +1275,7 @@ const loadRecipe = async function(id) {
     // console.log(res, data);
     } catch (err) {
         console.error(err);
+        throw err;
     }
 };
 
@@ -1322,6 +1324,8 @@ var _fractional = require("fractional");
 class RecipeView {
     #parentEle = document.querySelector(".recipe");
     #data;
+    #errorMsg = "We couldn't find that recipe. Please try another one!";
+    #successMsg = "";
     render(data) {
         this.#data = data;
         const markup = this.#generateMarkup();
@@ -1331,7 +1335,7 @@ class RecipeView {
     #clear() {
         this.#parentEle.innerHTML = "";
     }
-    renderSpinner = ()=>{
+    renderSpinner() {
         const markup = `<div class="spinner">
                       <svg>
                         <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
@@ -1339,7 +1343,31 @@ class RecipeView {
                     </div>`;
         this.#clear();
         this.#parentEle.insertAdjacentHTML("afterbegin", markup);
-    };
+    }
+    renderError(message = this.#errorMsg) {
+        const markup = `<div class="error">
+                      <div>
+                        <svg>
+                          <use href="${(0, _iconsSvgDefault.default)}.svg#icon-alert-triangle"></use>
+                        </svg>
+                      </div>
+                      <p>${message}</p>
+                    </div>`;
+        this.#clear();
+        this.#parentEle.insertAdjacentHTML("afterbegin", markup);
+    }
+    renderSuccess(message = this.#successMsg) {
+        const markup = `<div class="message">
+                      <div>
+                        <svg>
+                          <use href="${(0, _iconsSvgDefault.default)}.svg#icon-smile"></use>
+                        </svg>
+                      </div>
+                      <p>${message}</p>
+                    </div>`;
+        this.#clear();
+        this.#parentEle.insertAdjacentHTML("afterbegin", markup);
+    }
     addHandleRender = (handler)=>{
         [
             "hashchange",
